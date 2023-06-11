@@ -1,4 +1,5 @@
 import { Scene } from "phaser";
+import { animations } from "../PositionData/config";
 
 export class loadingScene extends Scene {
     progressBar: Phaser.GameObjects.Rectangle;
@@ -14,11 +15,17 @@ export class loadingScene extends Scene {
     public preload() {
         this.startLoadingProgress();
         this.load.setBaseURL('./Assets');
-        this.load.atlas("bgMenu", 'Images/BackGrounds/bgmenu.png', 'Images/BackGrounds/bgmenu.json').on('complete', () => {
-            this.bg = this.add.sprite(0, 0, "bgMenu", "bgmenu.png").setScale(2);
+        this.load.image("BG_02", "BackGrounds/BG_02.png").on("complete", () => {
+            this.bg = this.add.sprite(0, 0, "BG_02");
+            this.bg.setOrigin(0);
             this.bgContainer && this.bgContainer.add(this.bg);
-        }, this)
-        this.load.image("baseGameBG", 'Images/BackGrounds/baseGameBG.png');
+        }, this);
+        this.load.image("BG_01", "BackGrounds/BG_01.png");
+        this.load.image("BG_03", "BackGrounds/BG_03.png");
+        animations.forEach((anim: any) => {
+            for (let i = 0; i <= anim.frameCount; i++)
+                this.load.image(`${anim.name}_${i}`, `Characters/0/${anim.name}/${anim.name}_${i}.png`)
+        });
     }
 
     /** starts the loading process with preload */

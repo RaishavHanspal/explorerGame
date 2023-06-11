@@ -3,7 +3,7 @@ import { game } from "./PositionData/config";
 import { BaseGameScene } from "./Scene/BaseGameScene";
 import { loadingScene } from "./Scene/loadingScene";
 
-const slotConfig = {
+export const slotConfig = {
     /** to use WEBGL or canvas wherever applicable */
     type: Phaser.AUTO,
     width: game.width,
