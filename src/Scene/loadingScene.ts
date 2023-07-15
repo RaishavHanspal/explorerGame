@@ -1,5 +1,5 @@
 import { Scene } from "phaser";
-import { animations } from "../PositionData/config";
+import { animations, game } from "../PositionData/config";
 
 export class loadingScene extends Scene {
     progressBar: Phaser.GameObjects.Rectangle;
@@ -13,31 +13,22 @@ export class loadingScene extends Scene {
 
     /** should load these images before setting the scene */
     public preload() {
-        this.startLoadingProgress();
         this.load.setBaseURL('./Assets');
-        this.load.image("BG_02", "BackGrounds/BG_02.png").on("complete", () => {
-            this.bg = this.add.sprite(0, 0, "BG_02");
-            this.bg.setOrigin(0);
-            this.bgContainer && this.bgContainer.add(this.bg);
-        }, this);
-        this.load.image("BG_01", "BackGrounds/BG_01.png");
-        this.load.image("BG_03", "BackGrounds/BG_03.png");
-        animations.forEach((anim: any) => {
-            for (let i = 0; i <= anim.frameCount; i++)
-                this.load.image(`${anim.name}_${i}`, `Characters/0/${anim.name}/${anim.name}_${i}.png`)
-        });
+        this.startLoadingProgress();
+        this.loadBackgrounds();
+        this.loadCharacters();
     }
 
     /** starts the loading process with preload */
     private startLoadingProgress(): void {
         this.bgContainer = this.add.container(0, 0);
-        this.progressBar = this.add.rectangle(190, 280, 0, 30, 0xff00ff, 1);
-        this.progressBox = this.add.rectangle(630, 280, 900, 50, 0x222222, 0.8);
+        this.progressBar = this.add.rectangle(game.width / 2 - 450, game.height / 2 - 80, 0, 30, 0xff00ff, 1);
+        this.progressBox = this.add.rectangle(game.width / 2 - 10, game.height / 2 - 80, 900, 50, 0x222222, 0.8);
         this.progressBox.setOrigin(0.5);
         // Adds loading percentage text
         this.loadingText = this.make.text({
-            x: 640,
-            y: 355,
+            x: game.width / 2,
+            y: game.height / 2 - 80,
             text: '0%',
             style: {
                 font: '30px Arial',
@@ -61,6 +52,15 @@ export class loadingScene extends Scene {
             onComplete: (tween) => {
                 this.progressBox.setInteractive();
                 this.progressBox.on("pointerup", this.onTapToPlayPressed, this);
+                this.make.text({
+                    x: game.width / 2,
+                    y: game.height / 2 - 80,
+                    text: 'Start',
+                    style: {
+                        font: '30px Arial',
+                        color: '#ffffff'
+                    }
+                }).setOrigin(0.5);
             }
         });
     }
@@ -76,5 +76,31 @@ export class loadingScene extends Scene {
         this.children.removeAll();
         this.scene.start("BaseGame");
         this.scene.stop("default");
+    }
+
+    /** load all characters as mentioned in the config */
+    private loadCharacters(): void {
+        for (let character in animations) {
+            animations[character].forEach((anim: any) => {
+                for (let i = 0; i <= anim.frameCount; i++)
+                    this.load.image(`${anim.name}_${i}`, `Characters/${character}/${anim.name}/${anim.name}_${i}.png`)
+            });
+        }
+    }
+
+    /** load all backgounds */
+    private loadBackgrounds(): void {
+        for (let i: number = 1; i <= 3; i++) {
+            const loader: Phaser.Loader.LoaderPlugin = this.load.image(`BG_0${i}`, `BackGrounds/BG_0${i}.png`);
+            (i === 2) && loader.on("complete", () => {
+                this.bg = this.add.sprite(0, 0, `BG_0${i}`);
+                this.bg.setOrigin(0);
+                this.bgContainer && this.bgContainer.add(this.bg);
+                const background = document.getElementById("background");
+                background.style.backgroundImage = `url('./Assets/BackGrounds/BG_0${i}.png')`;
+                background.style.opacity = "1";
+            }, this);
+        }
+
     }
 }

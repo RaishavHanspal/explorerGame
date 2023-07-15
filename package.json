@@ -1,5 +1,5 @@
 {
-    "name": "slotgame",
+    "name": "explorer",
     "version": "1.0.0",
     "description": "Use Phaser Js to build a basic explorer game",
     "main": "index.js",
