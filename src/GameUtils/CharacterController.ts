@@ -37,6 +37,8 @@ export class CharacterController {
 
     /** play continuos and static animations using time calculated through framerate */
     private playAnim(anim: string, single?: boolean) {
+        /** handle condition for animations that are not loaded */
+        if((this.scene.anims as any).anims.entries[anim].frames.length === 0) return;
         if (this.singleAction) {
             this.player.playAfterRepeat(anim);
         }
