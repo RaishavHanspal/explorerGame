@@ -9,6 +9,7 @@ export class BaseGameScene extends Scene {
     private player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
     private characterController: CharacterController;
     private keyboard: any;
+    public _gamePad: Phaser.Input.Gamepad.Gamepad;
     constructor() {
         super({ key: "BaseGame" });
     }
@@ -30,6 +31,13 @@ export class BaseGameScene extends Scene {
         this.player = this.physics.add.sprite(0, -200, "Idle_0").setOrigin(0.5, 1).setScale(GameConstants.CharacterScale).setCollideWorldBounds(true);
         this.player.play("Idle");
         this.player.x = GameConstants.CharacterStartX;
+        (window as any).gameScene = this;
+        (window as any).game = this.game;
+        this.input.gamepad && this.input.gamepad.once('connected',  (pad:Phaser.Input.Gamepad.Gamepad) => {
+            //   'pad' is a reference to the gamepad that was just connected
+            console.log("Game Pad Connected!");
+            this._gamePad = pad;
+        });
         this.characterController = new CharacterController(this.player, this.keyboard, this.bgContainer, this.extraBG, this);
         this.physics.add.collider(this.player, floor);
     }

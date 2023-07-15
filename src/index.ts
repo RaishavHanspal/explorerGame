@@ -14,13 +14,18 @@ export const slotConfig = {
             gravity: { y: 200 }
         }
     },
+    input:{
+        keyboard: true,
+        gamepad: true
+    },
     scene: [loadingScene, BaseGameScene],
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
         width: game.width,
         height: game.height,
-    }
+    },
+    
 };
 
 new explorerGame(slotConfig);
