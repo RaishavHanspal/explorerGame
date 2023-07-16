@@ -3,15 +3,19 @@ import { animations, game } from "../PositionData/config";
 import { GameConstants } from "../Constants/Constants";
 import { CharacterController } from "../GameUtils/CharacterController";
 import { NPCController } from "../GameUtils/NPCController";
+import * as config from "../PositionData/config";
 
 export class BaseGameScene extends Scene {
     private bgContainer: Phaser.GameObjects.Container;
     private extraBG: Phaser.GameObjects.Image;
     private player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
     private characterController: CharacterController;
+    private antagonistController: NPCController[] = [];
     private keyboard: any;
     public _gamePad: Phaser.Input.Gamepad.Gamepad;
     private floor: Phaser.GameObjects.Rectangle;
+    public repeatSceneCounter: number = 0;
+    public playerDisplacement: number = 0;
     constructor() {
         super({ key: "BaseGame" });
     }
@@ -22,6 +26,7 @@ export class BaseGameScene extends Scene {
 
     /** after the preload is completed this should initialize and align the loaded assets */
     create() {
+        this.physics.world.setBounds(0, 0, config.game.width, config.game.height, true, false, false, true)
         this.bgContainer = this.add.container(0, 0);
         this.bgContainer.add(this.add.image(0, 0, "BG_01").setScale(1).setOrigin(0));
         this.extraBG = this.add.image(0, 0, "BG_01").setScale(1).setOrigin(0).setPosition(game.width, 0);
@@ -40,21 +45,23 @@ export class BaseGameScene extends Scene {
         });
         this.characterController = new CharacterController(this.player, this.keyboard, this.bgContainer, this.extraBG, this, "proto0");
         this.physics.add.collider(this.player, this.floor);
-        // this.sendAntagonist();
+        this.newNPCAntagonist(2200, "Idle");
+        this.newNPCAntagonist(4500, "Walk");
     }
 
     /** @todo: create the antagonist here and have it's target set to the player in action
      * the background and NPC position should be kept separated to better show relative motion
      */
-    private sendAntagonist(): void {
-        const antagonist = this.physics.add.sprite(1920, 500, "anta0_Idle_0").setOrigin(0.5, 1).setScale(-1, 1).setCollideWorldBounds(true, 1, 0);
-        antagonist.play("anta0_Idle");
-        new NPCController(antagonist, true, this.bgContainer, this.extraBG, this, this.player);
+    private newNPCAntagonist(x: number, anim: string): void {
+        const antagonist = this.physics.add.sprite(x, 500, "anta0_Idle_0").setOrigin(0.5, 1).setScale(-1, 1).setCollideWorldBounds(true);
+        antagonist.play("anta0_" + anim);
+        this.antagonistController.push(new NPCController(antagonist, true, this.bgContainer, this.extraBG, this, this.player, anim));
         this.physics.add.collider(antagonist, this.floor);
     }
 
     update(time: number, delta: number): void {
         this.characterController.update();
+        this.antagonistController.forEach((NPC: NPCController) => NPC.update())
     }
 
     generateFrames(anim: string, lastframe: number, character: string): Array<any> {

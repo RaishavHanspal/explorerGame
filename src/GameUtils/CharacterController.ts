@@ -20,7 +20,6 @@ export class CharacterController {
     /** to be invoked in scene class */
     public update() {
         if (this.singleAction) return;
-        console.log((this.scene._gamePad && this.scene._gamePad.A), this.leftStickPosition("right"))
         if (this.keyboard.W.isDown || (this.scene._gamePad && this.scene._gamePad.A)) {
             this.playSingleAction("Jump");
         }
@@ -30,15 +29,16 @@ export class CharacterController {
         else if (this.keyboard.D.isDown || this.leftStickPosition("right") || this.nipplePosition === "right") {
             this.run(true);
         }
-        else if (this.keyboard.A.isDown || this.leftStickPosition("left") || this.nipplePosition === "left") {
+        /** add condition to add bound on the very left of the screen - spawn point */
+        else if ((this.scene.playerDisplacement > 0) && (this.keyboard.A.isDown || this.leftStickPosition("left") || this.nipplePosition === "left")) {
             this.run(false);
         }
         else {
             this.playIdle();
         }
         this.extraBG.x = (this.bgContainer.x < 0 ? 1 : -1) * game.width;
-        (this.bgContainer.x <= -game.width) && (this.bgContainer.x = this.bgContainer.x + game.width);
-        (this.bgContainer.x >= game.width) && (this.bgContainer.x = this.bgContainer.x - game.width);
+        (this.bgContainer.x <= -game.width) && (this.bgContainer.x = this.bgContainer.x + game.width, this.scene.repeatSceneCounter++);
+        (this.bgContainer.x >= game.width) && (this.bgContainer.x = this.bgContainer.x - game.width, this.scene.repeatSceneCounter--);
     }
 
     /** play continuos and static animations using time calculated through framerate */
@@ -71,6 +71,7 @@ export class CharacterController {
         }
         this.isIdle = false;
         this.bgContainer.x += (forward ? -1 : 1) * 10;
+        this.scene.playerDisplacement += (forward ? 1 : -1) * 10;
     }
 
     /** use to play animation only to played once for each input */
