@@ -20,17 +20,17 @@ export class CharacterController {
     /** to be invoked in scene class */
     public update() {
         if (this.singleAction) return;
-        if (this.keyboard.D.isDown || this.leftStickPosition("right") || this.nipplePosition === "right") {
-            this.run(true);
-        }
-        else if (this.keyboard.A.isDown || this.leftStickPosition("left") || this.nipplePosition === "left") {
-            this.run(false);
-        }
-        else if (this.keyboard.W.isDown || (this.scene._gamePad && this.scene._gamePad.A) || this.leftStickPosition("up") || this.nipplePosition === "up") {
+        if (this.keyboard.W.isDown || (this.scene._gamePad && this.scene._gamePad.A)) {
             this.playSingleAction("Jump");
         }
         else if (this.keyboard.F.isDown || (this.scene._gamePad && this.scene._gamePad.X)) {
             this.playSingleAction("Attack");
+        }
+        else if (this.keyboard.D.isDown || this.leftStickPosition("right") || this.nipplePosition === "right") {
+            this.run(true);
+        }
+        else if (this.keyboard.A.isDown || this.leftStickPosition("left") || this.nipplePosition === "left") {
+            this.run(false);
         }
         else {
             this.playIdle();
@@ -97,7 +97,8 @@ export class CharacterController {
                 color: '#FAFAFA',
                 dynamicPage: true,
                 multitouch: true,
-                restOpacity: 0.1
+                restOpacity: 0.1,
+                lockX: true
             })
             this.nippleJoyStick.on('dir:up', () => {
                 this.nipplePosition = "up";
@@ -110,7 +111,13 @@ export class CharacterController {
             })
             this.nippleJoyStick.on('end', () => {
                 this.nipplePosition = "center";
-            })
+            });
+            document.getElementById("A-Button-Nipple").addEventListener("click", () => {
+                this.playSingleAction("Jump");
+            });
+            document.getElementById("X-Button-Nipple").addEventListener("click", () => {
+                this.playSingleAction("Attack");
+            });
         }
     }
 
