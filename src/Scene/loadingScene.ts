@@ -82,8 +82,9 @@ export class loadingScene extends Scene {
     private loadCharacters(): void {
         for (let character in animations) {
             animations[character].forEach((anim: any) => {
-                for (let i = 0; i <= anim.frameCount; i++)
-                    this.load.image(`${anim.name}_${i}`, `Characters/${character}/${anim.name}/${anim.name}_${i}.png`)
+                for (let i = 0; i <= anim.frameCount; i++){
+                    this.load.image(`${character}_${anim.name}_${i}`, `Characters/${character}/${anim.name}/${anim.name}_${i}.png`);
+                }
             });
         }
     }

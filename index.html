@@ -22,13 +22,15 @@
             background-size: cover;
         }
         
-        .nipple-buttons {
+        #nipple-buttons {
             right: 1%;
             bottom: 9%;
             opacity: 0.5;
             width: 30%;
             position: absolute;
             text-align: center;
+            opacity: 0;
+            transition: opacity 1s;
         }
         
         .nipple-action-button {
@@ -45,7 +47,7 @@
     <div id="background"></div>
     <script src="main.js" defer></script>
     <div id="JoyStick" style="left: 1%;width:30%;text-align: center;"></div>
-    <div class="nipple-buttons">
+    <div id="nipple-buttons">
         <button class="nipple-action-button" id="A-Button-Nipple">A</button>&nbsp;
         <button class="nipple-action-button" id="X-Button-Nipple">X</button>
     </div>

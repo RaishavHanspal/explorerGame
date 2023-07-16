@@ -13,13 +13,14 @@ export class CharacterController {
     constructor(private player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody,
         private keyboard: any,
         private bgContainer: Phaser.GameObjects.Container, private extraBG: Phaser.GameObjects.Image,
-        private scene: BaseGameScene) {
+        private scene: BaseGameScene, private charCode: string) {
         this.initializeNipple();
     }
 
     /** to be invoked in scene class */
     public update() {
         if (this.singleAction) return;
+        console.log((this.scene._gamePad && this.scene._gamePad.A), this.leftStickPosition("right"))
         if (this.keyboard.W.isDown || (this.scene._gamePad && this.scene._gamePad.A)) {
             this.playSingleAction("Jump");
         }
@@ -42,17 +43,18 @@ export class CharacterController {
 
     /** play continuos and static animations using time calculated through framerate */
     private playAnim(anim: string, single?: boolean) {
+        const animation: string = `${this.charCode}_${anim}`;
+        const animObj: any = (this.scene.anims as any).anims.entries[animation];
         /** handle condition for animations that are not loaded */
-        if ((this.scene.anims as any).anims.entries[anim].frames.length === 0) return;
+        if (animObj.frames.length === 0) return;
         if (this.singleAction) {
-            this.player.playAfterRepeat(anim);
+            this.player.playAfterRepeat(animation);
         }
         else if (!this.singleAction) {
-            this.player.play(anim);
+            this.player.play(animation);
         }
         if (single) {
             this.singleAction = true;
-            const animObj = (this.scene.anims as any).anims.entries[anim];
             const time: number = animObj.frames.length / animObj.frameRate;
             TimeUtils.setTimeOut(time * GameConstants.ONE_SECOND, this.scene, () => {
                 this.singleAction = false;
@@ -73,7 +75,7 @@ export class CharacterController {
 
     /** use to play animation only to played once for each input */
     private playSingleAction(anim: string): void {
-        if (this.isIdle) {
+        if (!this.singleAction) {
             this.playAnim(anim, true);
         }
         this.isIdle = false;
@@ -112,6 +114,7 @@ export class CharacterController {
             this.nippleJoyStick.on('end', () => {
                 this.nipplePosition = "center";
             });
+            document.getElementById("nipple-buttons").style.opacity = "1";
             document.getElementById("A-Button-Nipple").addEventListener("click", () => {
                 this.playSingleAction("Jump");
             });
